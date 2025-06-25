@@ -3,107 +3,130 @@ import ast
 class PythonLearningTool:
     def __init__(self):
         self.examples = {
-            'değişkenler': self.variable_example,
-            'kontrol yapıları': self.control_structure_example,
-            'fonksiyonlar': self.function_example,
-            'listeler': self.list_example,
-            'döngüler': self.loop_example,
-            'sözlükler': self.dictionary_example,
-            'hata yönetimi': self.exception_handling_example,
+            'variables': self.variable_example,
+            'control structures': self.control_structure_example,
+            'functions': self.function_example,
+            'lists': self.list_example,
+            'loops': self.loop_example,
+            'dictionaries': self.dictionary_example,
+            'exception handling': self.exception_handling_example,
         }
 
     def show_examples(self):
-        print("Örnek konular:")
+        print("Available topics:")
         for topic in self.examples.keys():
             print(f"- {topic}")
-        print("\nHangi konuyu görmek istersiniz?")
+        print("\nWhich topic would you like to see?")
 
     def variable_example(self):
         return """
-# Değişken Tanımlama
+# Variable Assignment
 x = 5
-y = "Merhaba"
+y = "Hello"
 print(x)
 print(y)
 """
 
     def control_structure_example(self):
         return """
-# Kontrol Yapıları
+# Control Structures
 x = 10
 if x > 5:
-    print("x 5'ten büyük")
+    print("x is greater than 5")
 else:
-    print("x 5'ten küçük veya eşit")
+    print("x is less than or equal to 5")
 """
 
     def function_example(self):
         return """
-# Fonksiyon Tanımlama
-def topla(a, b):
+# Function Definition
+def add(a, b):
     return a + b
 
-sonuc = topla(3, 4)
-print(sonuc)
+result = add(3, 4)
+print(result)
 """
 
     def list_example(self):
         return """
-# Liste Kullanımı
-meyveler = ["elma", "muz", "çilek"]
-for meyve in meyveler:
-    print(meyve)
+# List Usage
+fruits = ["apple", "banana", "strawberry"]
+for fruit in fruits:
+    print(fruit)
 """
 
     def loop_example(self):
         return """
-# Döngüler
+# Loops
 for i in range(5):
     print(i)
 """
 
     def dictionary_example(self):
         return """
-# Sözlük Kullanımı
-sozluk = {"ad": "Ali", "yaş": 30}
-print(sozluk["ad"])
+# Dictionary Usage
+person = {"name": "Alice", "age": 30}
+print(person["name"])
 """
 
     def exception_handling_example(self):
         return """
-# Hata Yönetimi
+# Exception Handling
 try:
     x = 1 / 0
 except ZeroDivisionError:
-    print("Sıfıra bölme hatası!")
+    print("Cannot divide by zero!")
 """
 
     def get_example(self, topic):
-        return self.examples.get(topic, lambda: "Bu konu bulunamadı.")()
+        return self.examples.get(topic.lower(), lambda: "Topic not found.")()
 
     def compare_code(self, user_code, example_code):
-        user_code_lines = user_code.strip().splitlines()
-        example_code_lines = example_code.strip().splitlines()
+        user_lines = user_code.strip().splitlines()
+        example_lines = example_code.strip().splitlines()
+        has_error = False
 
-        for i, line in enumerate(example_code_lines):
-            if i < len(user_code_lines):
-                if line.strip() != user_code_lines[i].strip():
-                    print(f"Hata: {i + 1}. satırda beklenen: '{line.strip()}', ancak yazdığınız: '{user_code_lines[i].strip()}'")
+        for i, line in enumerate(example_lines):
+            if i < len(user_lines):
+                if line.strip() != user_lines[i].strip():
+                    print(f"Error on line {i + 1}: expected: '{line.strip()}', but you wrote: '{user_lines[i].strip()}'")
+                    has_error = True
             else:
-                print(f"Hata: {i + 1}. satırda bekleniyordu, ancak siz yazmadınız.")
+                print(f"Error: line {i + 1} is missing.")
+                has_error = True
 
-        if len(user_code_lines) > len(example_code_lines):
-            print(f"Hata: Ekstra satır var, {len(user_code_lines) - len(example_code_lines)} fazla satır yazdınız.")
+        if len(user_lines) > len(example_lines):
+            extra = len(user_lines) - len(example_lines)
+            print(f"Error: You have {extra} extra line(s).")
+            has_error = True
 
-# Kullanıcı ile etkileşim
-tool = PythonLearningTool()
-tool.show_examples()
+        if not has_error:
+            print("✅ Your code matches the example!")
 
-seçim = input("Seçiminizi yapın: ").strip().lower()
-example_code = tool.get_example(seçim)
+# ---- User Interaction ----
 
-print("\nSeçilen konu örneği:\n")
-print(example_code)
+if __name__ == "__main__":
+    tool = PythonLearningTool()
+    tool.show_examples()
 
-user_code = input("Kendi kodunuzu yazın ve ardından 'CTRL+D' (Unix) veya 'CTRL+Z' (Windows) ile bitirin:\n")
-tool.compare_code(user_code, example_code)
+    topic = input("Enter your topic choice: ").strip().lower()
+    example_code = tool.get_example(topic)
+
+    if example_code == "Topic not found.":
+        print("❌ Invalid topic. Please restart and choose a valid one.")
+    else:
+        print("\nExample code for the selected topic:\n")
+        print(example_code)
+
+        print("\nNow write your own code for comparison.")
+        print("Finish your input with 'CTRL+D' (Unix/Linux/Mac) or 'CTRL+Z' (Windows) and press Enter.\n")
+
+        try:
+            user_input = ""
+            while True:
+                line = input()
+                user_input += line + "\n"
+        except EOFError:
+            pass
+
+        tool.compare_code(user_input, example_code)
